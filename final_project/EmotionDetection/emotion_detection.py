@@ -13,17 +13,37 @@ def emotion_detector(text_to_analyze):
         }
     }
 
+    response = requests.post(url, headers=headers, json=data)
+
+    # ✅ Handle blank input: return all None if status code is 400
+    if response.status_code == 400:
+        return {
+            'anger': None,
+            'disgust': None,
+            'fear': None,
+            'joy': None,
+            'sadness': None,
+            'dominant_emotion': None
+        }
+
+    if response.status_code != 200:
+        return {
+            'anger': None,
+            'disgust': None,
+            'fear': None,
+            'joy': None,
+            'sadness': None,
+            'dominant_emotion': None
+        }
+
     try:
-        response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
-        
         parsed = response.json()
         if isinstance(parsed, str):
             parsed = json.loads(parsed)
-        
+
         emotions = parsed['emotionPredictions'][0]['emotion']
-        dominant = max(emotions.items(), key=lambda x: x[1])[0]
-        
+        dominant = max(emotions, key=emotions.get)
+
         return {
             'anger': int(emotions['anger'] * 100),
             'disgust': int(emotions['disgust'] * 100),
@@ -33,7 +53,7 @@ def emotion_detector(text_to_analyze):
             'dominant_emotion': dominant
         }
 
-    except Exception as e:
+    except Exception:
         return {
             'anger': None,
             'disgust': None,
