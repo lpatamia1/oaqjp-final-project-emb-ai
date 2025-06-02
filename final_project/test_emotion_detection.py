@@ -4,6 +4,7 @@ from EmotionDetection.emotion_detection import emotion_detector
 class TestEmotionDetection(unittest.TestCase):
     def test_joy_detection(self):
         result = emotion_detector("I am glad this happened")
+        print("DEBUG:", result) 
         self.assertEqual(result['dominant_emotion'], 'joy')
     
     def test_anger_detection(self):
